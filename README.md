@@ -19,3 +19,79 @@ Processing - The processing in the ELK Stack (Elasticsearch, Logstash, and Kiban
    >Kibana is the visualization and exploration tool in the ELK Stack.
    
 # https://dytvr9ot2sszz.cloudfront.net/wp-content/uploads/2023/05/image-19.png 
+
+# elk installation documentation
+
+# Import the Elasticsearch PGP Key
+
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+
+# Installing from the APT repository
+
+sudo apt-get install apt-transport-https -y
+
+# Save the repository definition
+
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+
+# To install the Elasticsearch
+
+sudo apt-get update && sudo apt-get install elasticsearch
+
+# To start Elasticsearch with security enabled
+
+export ELASTIC_PASSWORD="<your_password>"
+
+# To configure Elasticsearch to start automatically when the system boots up
+
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable elasticsearch.service
+
+# Elasticsearch can be started 
+
+sudo systemctl start elasticsearch.service
+
+# Check that Elasticsearch is running
+
+sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200 
+
+# Configuring Elasticsearch
+
+sudo vim /etc/elasticsearch/elasticsearch.yml
+
+# find the line that specifies network.host, uncomment it, and replace its value with localhost like this.
+
+network.host: localhost
+
+# find the line that specifies http.port, uncomment it like this.
+
+http.port: 9200
+
+# If (sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200) command doesn't work then this should work
+
+# reset password of elastic
+
+/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+
+# Then take the new password and put it in the place of $elasticsearch.like this
+
+sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:<new password> https://localhost:9200
+
+{output} :
+{
+  "name" : "vagrant",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "OsRbZ1OZTEGNq1GIEV70CA",
+  "version" : {
+    "number" : "8.15.2",
+    "build_flavor" : "default",
+    "build_type" : "deb",
+    "build_hash" : "98adf7bf6bb69b66ab95b761c9e5aadb0bb059a3",
+    "build_date" : "2024-09-19T10:06:03.564235954Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.11.1",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
