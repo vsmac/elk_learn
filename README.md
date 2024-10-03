@@ -67,7 +67,7 @@ network.host: localhost
 
 http.port: 9200
 
-# If (sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200) command doesn't work then this should work
+#(sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200) If this command doesn't work then run this commands
 
 # reset password of elastic
 
