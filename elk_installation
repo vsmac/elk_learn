@@ -1,0 +1,136 @@
+
+# ELK installation documentation
+
+# Elasticsearch installation
+
+# Import the Elasticsearch PGP Key
+
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
+
+# Installing from the APT repository
+
+sudo apt-get install apt-transport-https -y
+
+# Save the repository definition
+
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+
+# To install the Elasticsearch
+
+sudo apt-get update && sudo apt-get install elasticsearch
+
+# To configure Elasticsearch to start automatically when the system boots up
+
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable elasticsearch.service
+
+# Elasticsearch can be started 
+
+sudo systemctl start elasticsearch.service
+
+# Configuring Elasticsearch
+
+sudo vim /etc/elasticsearch/elasticsearch.yml
+
+# find the line that specifies network.host, uncomment it, and replace its value with localhost like this.
+
+network.host: localhost
+
+# find the line that specifies http.port, uncomment it like this.
+
+http.port: 9200
+
+# If (sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200) command doesn't work then this should work
+
+# Reset password of elastic
+
+/usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+
+export ELASTIC_PASSWORD="<reset-password>"
+
+# Check that Elasticsearch is running
+
+sudo curl --cacert /etc/elasticsearch/certs/http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200 
+
+{output} :
+{
+  "name" : "vagrant",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "OsRbZ1OZTEGNq1GIEV70CA",
+  "version" : {
+    "number" : "8.15.2",
+    "build_flavor" : "default",
+    "build_type" : "deb",
+    "build_hash" : "98adf7bf6bb69b66ab95b761c9e5aadb0bb059a3",
+    "build_date" : "2024-09-19T10:06:03.564235954Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.11.1",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+
+# To Check Elasticsearch cluster health
+
+curl -X GET "localhost:9200/_cluster/health?pretty"
+
+# List All Nodes in the Cluster
+
+curl -X GET "localhost:9200/_cat/nodes?v"
+
+# To Create an Index
+
+curl -X PUT "localhost:9200/my-index?pretty" -H 'Content-Type: application/json' -d'
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}'
+
+# Delete an index
+
+curl -X DELETE "localhost:9200/my-index?pretty"
+
+# To list all the indices in Elasticsearch 
+
+curl -X GET "localhost:9200/_cat/indices?v"
+
+## Kibana installation
+
+sudo apt-get update && sudo apt-get install kibana
+
+# Configuring of kibana
+
+sudo vim /etc/kibana/kibana.yml
+
+# find the line that specifies network.host, uncomment it, and replace its value with localhost like this.
+
+server.host: localhost
+
+# find the line that specifies http.port, uncomment it like this.
+
+http.port: 5601
+
+# To configure Kibana to start automatically when the system starts
+
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable kibana.service
+
+# For start kibana service
+
+sudo systemctl start kibana.service
+
+## Logstash installation
+
+sudo apt-get update && sudo apt-get install logstash
+
+# To start logstash automatically and enabled logstash service
+
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable logstash
+
+# For start logstash service
+
+sudo systemctl start logstash
